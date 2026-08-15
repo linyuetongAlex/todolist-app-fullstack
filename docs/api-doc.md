@@ -101,6 +101,113 @@ get todo task lists
 - code=40101: 未登录或 token 失效
 
 
+## GET /api/todos/stats/daily
+### 1. api description   
+get completed task lists by days
+
+### 2. request url  
+`{apiAddress}/api/todos/stats/daily`  
+
+### 3. request method  
+**GET**  
+
+### 4. request parameters  
+#### 4.1 Header parameters  
+| Parameter name| Required | Type      | description         |
+| ------------ | ---- | ---------------- | ------------ |
+| Content-Type | Yes   | application/json | 请求体的格式 |
+| Authorization | Yes   | string | Bearer {token},登录后获取的 JWT 令牌 |  
+
+### 5. response example  
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data": 3
+}
+```
+
+### 6. remark  
+- code=0: 获取成功
+- code=40101: 未登录或 token 失效
+
+
+## GET /api/todos/stats/weekly
+### 1. api description   
+get completed task lists by weeks
+
+### 2. request url  
+`{apiAddress}/api/todos/stats/weekly`  
+
+### 3. request method  
+**GET**  
+
+### 4. request parameters  
+#### 4.1 Header parameters  
+| Parameter name| Required | Type      | description         |
+| ------------ | ---- | ---------------- | ------------ |
+| Content-Type | Yes   | application/json | 请求体的格式 |
+| Authorization | Yes   | string | Bearer {token},登录后获取的 JWT 令牌 |  
+
+### 5. response example  
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data":  [
+        { "date": "2026-08-10", "count": 2 },
+        { "date": "2026-08-11", "count": 0 },
+        { "date": "2026-08-12", "count": 5 },
+        { "date": "2026-08-13", "count": 1 },
+        { "date": "2026-08-14", "count": 0 },
+        { "date": "2026-08-15", "count": 3 },
+        { "date": "2026-08-16", "count": 0 }
+    ]
+}
+```
+
+### 6. remark  
+- code=0: 获取成功
+- code=40101: 未登录或 token 失效
+- 数组按日期升序排列（周一在前，周日在后）
+
+
+## GET /api/todos/stats/monthly
+### 1. api description   
+get completed task lists by months
+
+### 2. request url  
+`{apiAddress}/api/todos/stats/monthly`  
+
+### 3. request method  
+**GET**  
+
+### 4. request parameters  
+#### 4.1 Header parameters  
+| Parameter name| Required | Type      | description         |
+| ------------ | ---- | ---------------- | ------------ |
+| Content-Type | Yes   | application/json | 请求体的格式 |
+| Authorization | Yes   | string | Bearer {token},登录后获取的 JWT 令牌 |  
+
+### 5. response example  
+```json
+{
+    "code": 0,
+    "msg": "success",
+    "data":  [
+        { "date": "2026-08-01", "count": 1 },
+        { "date": "2026-08-02", "count": 0 },
+        { "date": "2026-08-03", "count": 4 }
+    ]
+}
+```
+
+### 6. remark  
+- code=0: 获取成功
+- code=40101: 未登录或 token 失效
+- data 为数组，元素个数等于当月天数（28/29/30/31不等）
+- 数组按日期升序排列（1号在前，月末在后）
+
 ## PATCH /api/todos/{todo_id}
 ### 1. api description    
 update a todo task

@@ -26,7 +26,7 @@ function TodoList() {
   const [editDeadline, setEditDeadline] = useState('')
   const [editError, setEditError] = useState('')
 
-  const [sortBy, setSortBy] = useState<'time' | 'priority'>('time')
+  const [sortBy, setSortBy] = useState<'default' | 'time' | 'priority'>('default')
 
   async function fetchTodos() {
     setLoading(true)
@@ -114,6 +114,19 @@ function TodoList() {
   const value = p ?? 0
   return value === 0 ? 'Low' : value === 1 ? 'Medium' : 'High'
 }
+  
+  const sortedTodos = sortBy === 'default'
+    ? todos
+    : [...todos].sort((a, b) => {
+        if (a.status !== b.status) {
+          return a.status - b.status
+        }
+        if (sortBy === 'priority') {
+          return (b.priority ?? 0) - (a.priority ?? 0)
+        } else {
+          return a.create_time.localeCompare(b.create_time)
+        }
+    })
 
   return (
     <div className="todo-page">
@@ -142,9 +155,14 @@ function TodoList() {
         {createError && <p className="error-text">{createError}</p>}
       </form>
 
+      <select className="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value as 'default' | 'time' | 'priority')}>
+        <option value="default">Default</option>
+        <option value="time">By Create Time</option>
+        <option value="priority">By Priority</option>
+      </select>
       
       <ul className="todo-list">
-        {todos.map((todo) => (
+        {sortedTodos.map((todo) => (
           <li key={todo.todo_id} className="todo-card" onClick={() => handleSelectTodo(todo)}>
             <input
               type="checkbox"
