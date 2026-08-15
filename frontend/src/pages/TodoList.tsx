@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getTodoList, createTodo, updateTodoStatus, deleteTodo, type Todo, updateTodo } from '../api/todo'
 import '../TodoList.css'
+import StatsDashboard from '../components/StatsDashboard'
 
 function TodoList() {
   const [todos, setTodos] = useState<Todo[]>([])
@@ -25,7 +26,7 @@ function TodoList() {
   const [editDeadline, setEditDeadline] = useState('')
   const [editError, setEditError] = useState('')
 
-  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
+  const [sortBy, setSortBy] = useState<'time' | 'priority'>('time')
 
   async function fetchTodos() {
     setLoading(true)
@@ -69,7 +70,7 @@ function TodoList() {
   }
 
   async function handleDelete(todoId: string) {
-    if (!window.confirm('确定要删除这个任务吗？')) return
+    if (!window.confirm('Do you want to delete this task? This action cannot be undone.')) return
     try {
       await deleteTodo(todoId)
       await fetchTodos()
@@ -105,7 +106,7 @@ function TodoList() {
   }
 
 
-  if (loading) return <p>加载中...</p>
+  if (loading) return <p>Loading...</p>
   if (error) return <p style={{ color: 'red' }}>{error}</p>
 
   const totalPages = Math.ceil(total / pageSize)
@@ -116,8 +117,8 @@ function TodoList() {
 
   return (
     <div className="todo-page">
-      <h1>My Todos</h1>
-
+      <h1 style={{ textAlign: 'center' }}>My Todos</h1>
+      <StatsDashboard />
       <form className="create-form" onSubmit={handleCreate}>
         <input
           value={newTitle}
@@ -141,6 +142,7 @@ function TodoList() {
         {createError && <p className="error-text">{createError}</p>}
       </form>
 
+      
       <ul className="todo-list">
         {todos.map((todo) => (
           <li key={todo.todo_id} className="todo-card" onClick={() => handleSelectTodo(todo)}>

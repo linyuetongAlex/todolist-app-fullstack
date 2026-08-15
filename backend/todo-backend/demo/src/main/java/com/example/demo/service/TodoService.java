@@ -14,8 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -79,6 +85,79 @@ public class TodoService {
         return  todoRepository.findByUserAndStatus(user,status,pageable);
     }
 
+    public int getDailyStats(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new BusinessException(40101, "用户不存在或token失效")
+        );
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay();
+
+        List<Todo> completedToday = todoRepository.findByUserAndStatusAndCompleteTimeBetween(user, 1, start, end);
+        return completedToday.size();
+    }
+
+    public List<Map<String, Object>> getWeeklyStats(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new BusinessException(40101, "用户不存在或token失效")
+        );
+
+        LocalDate today = LocalDate.now();
+        LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate sunday = monday.plusDays(6);
+
+        List<Todo> weekTodos = todoRepository.findByUserAndStatusAndCompleteTimeBetween(
+                user, 1, monday.atStartOfDay(), sunday.plusDays(1).atStartOfDay()
+        );
+
+        Map<LocalDate, Long> countByDate = weekTodos.stream()
+                .collect(Collectors.groupingBy(
+                        todo -> todo.getCompleteTime().toLocalDate(),
+                        Collectors.counting()
+                ));
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        for (int i = 0; i < 7; i++) {
+            LocalDate date = monday.plusDays(i);
+            Map<String, Object> item = new HashMap<>();
+            item.put("date", date.format(formatter));
+            item.put("count", countByDate.getOrDefault(date, 0L));
+            result.add(item);
+        }
+        return result;
+    }
+
+    public List<Map<String, Object>> getMonthlyStats(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new BusinessException(40101, "用户不存在或token失效")
+        );
+
+        LocalDate today = LocalDate.now();
+        LocalDate firstDay = today.withDayOfMonth(1);
+
+        List<Todo> monthTodos = todoRepository.findByUserAndStatusAndCompleteTimeBetween(
+                user, 1, firstDay.atStartOfDay(), firstDay.plusMonths(1).atStartOfDay()
+        );
+
+        Map<LocalDate, Long> countByDate = monthTodos.stream()
+                .collect(Collectors.groupingBy(
+                        todo -> todo.getCompleteTime().toLocalDate(),
+                        Collectors.counting()
+                ));
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        int lenOfMonth= YearMonth.from(today).lengthOfMonth();
+        for (int i = 0; i < lenOfMonth; i++) {
+            LocalDate date = firstDay.plusDays(i);
+            Map<String, Object> item = new HashMap<>();
+            item.put("date", date.format(formatter));
+            item.put("count", countByDate.getOrDefault(date, 0L));
+            result.add(item);
+        }
+        return result;
+    }
 
     public Todo updateTodo(String userId, String todoId, TodoRequest request) {
         // 1. 查询Todo，找不到 → 40401

@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -77,6 +78,27 @@ public class TodoController {
 
         PageResponse<TodoResponse> pageResponse = PageResponse.of(responseList, todoPage.getTotalElements(), page, pageSize);
         return Response.success(pageResponse);
+    }
+
+    @GetMapping("/stats/daily")
+    public Response<Integer> getDailyStats(Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
+        int count = todoService.getDailyStats(userId);
+        return Response.success(count);
+    }
+
+    @GetMapping("/stats/weekly")
+    public Response<List<Map<String, Object>>> getWeeklyStats(Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
+        List<Map<String, Object>> result=todoService.getWeeklyStats(userId);
+        return Response.success(result);
+    }
+
+    @GetMapping("/stats/monthly")
+    public Response<List<Map<String, Object>>> getMonthlyStats(Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
+        List<Map<String, Object>> result=todoService.getMonthlyStats(userId);
+        return Response.success(result);
     }
 
     @PatchMapping("/{todoId}")
