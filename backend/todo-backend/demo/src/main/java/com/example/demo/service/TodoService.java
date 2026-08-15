@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -56,11 +57,28 @@ public class TodoService {
                 ()->new BusinessException(40101, "用户不存在或token失效")
         );
         // 2. 构造 Pageable： PageRequest.of(page - 1, pageSize)   注意页码要减1
-        Pageable pageable= PageRequest.of(page - 1, pageSize);
+        Pageable pageable= PageRequest.of(page - 1, pageSize, Sort.by("createTime").ascending());
         // 3. 调用 todoRepository.findByUser(user, pageable)
         // 4. 返回结果
-        return  todoRepository.findByUser(user,pageable);
+        return  todoRepository.findByUserMixedOrder(user,pageable);
     }
+
+    public Page<Todo> getTodoListByStatus(String userId, int page, int pageSize,Integer status) {
+        // 1. 用userId查出User对象
+        User user=userRepository.findById(userId).orElseThrow(
+                ()->new BusinessException(40101, "用户不存在或token失效")
+        );
+        // 查未完成任务（或者不分状态查全部）→ 按 createTime 升序, 查已完成任务 → 按 completeTime 降序
+        Sort sort = status != null && status == 1
+                ? Sort.by("completeTime").descending()
+                : Sort.by("createTime").ascending();
+        // 2. 构造 Pageable： PageRequest.of(page - 1, pageSize)   注意页码要减1
+        Pageable pageable= PageRequest.of(page - 1, pageSize,sort);
+        // 3. 调用 todoRepository.findByUserAndStatus(user,status,pageable)
+        // 4. 返回结果
+        return  todoRepository.findByUserAndStatus(user,status,pageable);
+    }
+
 
     public Todo updateTodo(String userId, String todoId, TodoRequest request) {
         // 1. 查询Todo，找不到 → 40401

@@ -31,15 +31,43 @@ public class TodoController {
         return Response.success(todoResponse);
     }
 
+//    @GetMapping
+//    public Response<PageResponse<TodoResponse>> getTodoList(
+//            @RequestParam(defaultValue = "1") int page,
+//            @RequestParam(defaultValue = "10") int pageSize,
+//            Authentication authentication) {
+//        // 1. 取出userId
+//        String userId = (String) authentication.getPrincipal();
+//        // 2. 调用todoService.getTodoList(...)，拿到 Page<Todo>
+//        Page<Todo> todoPage=todoService.getTodoList(userId,page,pageSize);
+//        // 3. 把 Page<Todo> 里的每一个Todo，转换成TodoResponse
+//        // 4. 用 PageResponse.of(...) 组装，再用 Response.success(...) 包装返回
+//        List<TodoResponse> responseList=todoPage.getContent()
+//                .stream()//把List转换成一个"数据流"，可以对流式地做一系列操作
+//                .map(TodoResponse::from)//对流里的每一个元素，都调用 TodoResponse.from(...)
+//                .collect(Collectors.toList());//处理完的流，重新收集成一个 List
+//
+//        PageResponse<TodoResponse> pageResponse = PageResponse.of(responseList, todoPage.getTotalElements(), page, pageSize);
+//        return Response.success(pageResponse);
+//    }
+
     @GetMapping
     public Response<PageResponse<TodoResponse>> getTodoList(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) Integer status,
             Authentication authentication) {
         // 1. 取出userId
         String userId = (String) authentication.getPrincipal();
-        // 2. 调用todoService.getTodoList(...)，拿到 Page<Todo>
-        Page<Todo> todoPage=todoService.getTodoList(userId,page,pageSize);
+
+        Page<Todo> todoPage;
+        if (status!=null){
+            todoPage=todoService.getTodoListByStatus(userId,page,pageSize,status);
+        } else{
+            // 2. 调用todoService.getTodoList(...)，拿到 Page<Todo>
+            todoPage=todoService.getTodoList(userId,page,pageSize);
+        }
+
         // 3. 把 Page<Todo> 里的每一个Todo，转换成TodoResponse
         // 4. 用 PageResponse.of(...) 组装，再用 Response.success(...) 包装返回
         List<TodoResponse> responseList=todoPage.getContent()

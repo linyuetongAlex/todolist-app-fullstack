@@ -25,6 +25,8 @@ function TodoList() {
   const [editDeadline, setEditDeadline] = useState('')
   const [editError, setEditError] = useState('')
 
+  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
+
   async function fetchTodos() {
     setLoading(true)
     try {
