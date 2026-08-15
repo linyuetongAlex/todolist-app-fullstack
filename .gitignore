@@ -19,6 +19,7 @@
 *.tar.gz
 *.rar
 *.mvn
+*.json
 
 # virtual machine crash logs
 hs_err_pid*
