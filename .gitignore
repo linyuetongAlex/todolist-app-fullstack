@@ -34,7 +34,7 @@ mvn*
 *.iml
 .vscode/
 
-pom.xml
+
 demo.iml
 application.properties
 
