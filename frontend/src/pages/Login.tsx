@@ -43,7 +43,7 @@ function Login() {
               />
             </div>
             {error && <p className="error-text">{error}</p>}
-            <button type="submit" className="btn-primary">登录</button>
+            <button type="submit" className="btn-primary">Login</button>
           </form>
           <p className="auth-footer">
             No account? <Link to="/register">Register</Link>
