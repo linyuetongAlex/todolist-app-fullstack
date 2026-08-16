@@ -190,7 +190,7 @@ function TodoList() {
               </div>
               {todo.description && <div className="todo-description">{todo.description}</div>}
               <div className="todo-deadline">
-                {todo.deadline ? new Date(todo.deadline).toLocaleString() : '无截止时间'}
+                {todo.deadline ? new Date(todo.deadline).toLocaleString() : 'No Deadline'}
               </div>
             </div>
             <div className="todo-actions">
