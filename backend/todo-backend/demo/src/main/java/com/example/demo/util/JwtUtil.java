@@ -3,6 +3,9 @@ package com.example.demo.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -11,10 +14,15 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // 密钥，实际项目中应该放到配置文件里，不要硬编码在代码中（我们先跑通功能，后面再优化）
-    private final SecretKey key = Keys.hmacShaKeyFor(
-            "this-is-a-very-long-secret-key-for-jwt-signing-1234567890".getBytes()
-    );
+    @Value("${jwt.secret}")
+    private String secretString;
+
+    private SecretKey key;
+
+    @PostConstruct
+    public void init() {
+        key = Keys.hmacShaKeyFor(secretString.getBytes());
+    }
 
     private final long EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000L; // 7天有效期
 

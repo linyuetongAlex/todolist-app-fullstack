@@ -128,6 +128,11 @@ function TodoList() {
         }
     })
 
+  function isOverdue(todo: Todo): boolean {
+    if (!todo.deadline || todo.status === 1) return false
+    return new Date(todo.deadline) < new Date()
+}
+
   return (
     <div className="todo-page">
       <h1 style={{ textAlign: 'center' }}>My Todos</h1>
@@ -163,7 +168,7 @@ function TodoList() {
       
       <ul className="todo-list">
         {sortedTodos.map((todo) => (
-          <li key={todo.todo_id} className="todo-card" onClick={() => handleSelectTodo(todo)}>
+          <li key={todo.todo_id} className={`todo-card ${isOverdue(todo) ? 'overdue' : ''}`} onClick={() => handleSelectTodo(todo)}>
             <input
               type="checkbox"
               className="todo-checkbox"

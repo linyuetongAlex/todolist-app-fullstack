@@ -231,3 +231,7 @@
 .sort-select:hover {
   border-color: var(--color-primary-light);
 }
+
+.todo-card.overdue {
+  opacity: 0.6;
+}
