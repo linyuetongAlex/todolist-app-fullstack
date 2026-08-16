@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8080'
+const BASE_URL = 'https://todolist-app-fullstack.onrender.com'
 
 interface ApiResponse<T> {
   code: number
